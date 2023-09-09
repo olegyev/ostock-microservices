@@ -1,0 +1,22 @@
+spring:
+  application:
+    # Used for service discovery
+    name: config-server
+  profiles:
+    # Searches for config files within the server's filesystem
+    active: native
+
+  cloud:
+    config:
+      server:
+        native:
+          # Searches for config files within:
+          #   src/main/resources/config
+          # Another option:
+          #   file:///{FILE_PATH}
+          #   E.g.:
+          #   file:///Users/Some.Username
+          search-locations: classpath:/config
+
+server:
+  port: 8071
