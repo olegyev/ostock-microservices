@@ -32,8 +32,28 @@ services:
         aliases:
           - "configserver"
 
+  eurekaserver:
+    image: ostock/eureka:0.0.1-SNAPSHOT
+    ports:
+      - "8070:8070"
+    environment:
+      SPRING_PROFILES_ACTIVE: "dev"
+      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
+      EUREKA_INSTANCE_HOSTNAME: "eurekaserver"
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "eurekaserver"
+
   licensingservice:
     image: ostock/licensing-service:0.0.1-SNAPSHOT
+    ports:
+      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: "dev"
       SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
@@ -43,8 +63,6 @@ services:
         condition: service_healthy
       configserver:
         condition: service_started
-    ports:
-      - "8080:8080"
     networks:
       backend:
         aliases:
