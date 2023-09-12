@@ -1,0 +1,11 @@
+# https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config.files.property-placeholders
+# Property placeholders are replaced in Docker Compose file with the env variables
+
+spring:
+  application:
+    name: organization-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  config:
+    # https://stackoverflow.com/a/70813003
+    import: ${SPRING_CONFIG_IMPORT:configserver:http://localhost:8071}
