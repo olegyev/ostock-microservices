@@ -58,6 +58,7 @@ services:
       SPRING_PROFILES_ACTIVE: "dev"
       SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://database:5432/ostock_dev"
+      EUREKA_INSTANCE_HOSTNAME: "eurekaserver"
     depends_on:
       database:
         condition: service_healthy
@@ -76,6 +77,7 @@ services:
       SPRING_PROFILES_ACTIVE: "dev"
       SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://database:5432/ostock_dev"
+      EUREKA_INSTANCE_HOSTNAME: "eurekaserver"
     depends_on:
       database:
         condition: service_healthy
