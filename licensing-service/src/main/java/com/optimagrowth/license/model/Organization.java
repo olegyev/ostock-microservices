@@ -1,4 +1,4 @@
-package com.optimagrowth.organization.model;
+package com.optimagrowth.license.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

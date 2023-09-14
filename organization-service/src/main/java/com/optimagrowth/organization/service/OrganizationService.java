@@ -15,13 +15,13 @@ import java.util.UUID;
 public class OrganizationService {
 
     @Autowired
-    MessageSource messages;
+    private MessageSource messages;
 
     @Autowired
     private OrganizationRepository organizationRepository;
 
     @Autowired
-    ServiceConfig config;
+    private ServiceConfig config;
 
     public Organization getOrganization(String organizationId, Locale locale) {
         Optional<Organization> organization = organizationRepository.findById(organizationId);

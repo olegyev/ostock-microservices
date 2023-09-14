@@ -39,6 +39,30 @@ public class LicenseController {
         return ResponseEntity.ok(license);
     }
 
+    /**
+     * @param clientType can be of the following values to invoke the organization service:
+     * <b>discovery</b>:
+     * Uses the Spring Discovery Client and a standard Spring RestTemplate class
+     * @see com.optimagrowth.license.service.client.OrganizationDiscoveryClient
+     *
+     * <b>rest</b>:
+     * Uses an enhanced Spring RestTemplate to invoke the Load Balancer service
+     * @see com.optimagrowth.license.service.client.OrganizationRestTemplateClient
+     *
+     * <b>feign</b>:
+     * Uses Netflix’s Feign client library to invoke a service via the Load Balancer
+     * @see com.optimagrowth.license.service.client.OrganizationFeignClient
+     */
+    @GetMapping(value = "/{licenseId}/{clientType}")
+    public ResponseEntity<License> getLicenseWithEurekaClient(
+            @PathVariable("organizationId") String organizationId,
+            @PathVariable("licenseId") String licenseId,
+            @PathVariable("clientType") String clientType,
+            @RequestHeader(value = "Accept-Language", required = false) Locale locale) {
+        License license = licenseService.getLicense(licenseId, organizationId, clientType, locale);
+        return ResponseEntity.ok(license);
+    }
+
     @PutMapping
     public ResponseEntity<String> updateLicense(
             @RequestBody License requestBody,

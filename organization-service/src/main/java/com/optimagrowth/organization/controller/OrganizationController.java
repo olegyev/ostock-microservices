@@ -14,26 +14,25 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping(value = "v1/organization")
-public class LicenseController {
+public class OrganizationController {
 
     @Autowired
-    MessageSource messages;
+    private MessageSource messages;
 
     @Autowired
-    OrganizationService organizationService;
+    private OrganizationService organizationService;
 
     @GetMapping(value = "/{organizationId}")
     public ResponseEntity<Organization> getOrganization(
             @PathVariable("organizationId") String organizationId,
-            @PathVariable("licenseId") String licenseId,
             @RequestHeader(value = "Accept-Language", required = false) Locale locale) {
         Organization organization = organizationService.getOrganization(organizationId, locale);
 
         organization.add(
-                linkTo(methodOn(LicenseController.class).getOrganization(organizationId, null, locale)).withSelfRel(),
-                linkTo(methodOn(LicenseController.class).createOrganization(organization, null)).withRel("createLicense"),
-                linkTo(methodOn(LicenseController.class).updateOrganization(organization, null)).withRel("updateLicense"),
-                linkTo(methodOn(LicenseController.class).deleteLicense(organizationId, null)).withRel("deleteLicense")
+                linkTo(methodOn(OrganizationController.class).getOrganization(organizationId, locale)).withSelfRel(),
+                linkTo(methodOn(OrganizationController.class).createOrganization(organization, null)).withRel("createLicense"),
+                linkTo(methodOn(OrganizationController.class).updateOrganization(organization, null)).withRel("updateLicense"),
+                linkTo(methodOn(OrganizationController.class).deleteLicense(organizationId, null)).withRel("deleteLicense")
         );
 
         return ResponseEntity.ok(organization);
@@ -59,7 +58,7 @@ public class LicenseController {
         return ResponseEntity.ok(responseMessage);
     }
 
-    @DeleteMapping(value = "/{licenseId}")
+    @DeleteMapping(value = "/{organizationId}")
     public ResponseEntity<String> deleteLicense(
             @PathVariable("organizationId") String organizationId,
             @RequestHeader(value = "Accept-Language", required = false) Locale locale) {

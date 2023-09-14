@@ -2,7 +2,11 @@ package com.optimagrowth.license.service;
 
 import com.optimagrowth.license.config.ServiceConfig;
 import com.optimagrowth.license.model.License;
+import com.optimagrowth.license.model.Organization;
 import com.optimagrowth.license.repository.LicenseRepository;
+import com.optimagrowth.license.service.client.OrganizationDiscoveryClient;
+import com.optimagrowth.license.service.client.OrganizationFeignClient;
+import com.optimagrowth.license.service.client.OrganizationRestTemplateClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -14,13 +18,22 @@ import java.util.UUID;
 public class LicenseService {
 
     @Autowired
-    MessageSource messages;
+    private MessageSource messages;
 
     @Autowired
     private LicenseRepository licenseRepository;
 
     @Autowired
-    ServiceConfig config;
+    private ServiceConfig config;
+
+    @Autowired
+    private OrganizationFeignClient organizationFeignClient;
+
+    @Autowired
+    private OrganizationRestTemplateClient organizationRestTemplateClient;
+
+    @Autowired
+    private OrganizationDiscoveryClient organizationDiscoveryClient;
 
     public License getLicense(String licenseId, String organizationId, Locale locale) {
         License license = licenseRepository.findByOrganizationIdAndLicenseId(organizationId, licenseId);
@@ -31,6 +44,46 @@ public class LicenseService {
                     organizationId));
         }
         return license.withComment(config.getProperty());
+    }
+
+    public License getLicense(String licenseId, String organizationId, String clientType, Locale locale) {
+        License license = licenseRepository.findByOrganizationIdAndLicenseId(organizationId, licenseId);
+
+        if (null == license) {
+            throw new IllegalArgumentException(String.format(
+                    messages.getMessage("license.search.error.message", null, locale),
+                    licenseId,
+                    organizationId));
+        }
+
+        Organization organization = retrieveOrganizationInfo(organizationId, clientType);
+
+        if (null != organization) {
+            license.setOrganizationName(organization.getName());
+            license.setContactName(organization.getContactName());
+            license.setContactEmail(organization.getContactEmail());
+            license.setContactPhone(organization.getContactPhone());
+        }
+
+        return license.withComment(config.getProperty());
+    }
+
+    private Organization retrieveOrganizationInfo(String organizationId, String clientType) {
+        return switch (clientType) {
+            case "discovery" -> {
+                System.out.println("I am using the discovery client");
+                yield organizationDiscoveryClient.getOrganization(organizationId);
+            }
+            case "rest" -> {
+                System.out.println("I am using the rest client");
+                yield organizationRestTemplateClient.getOrganization(organizationId);
+            }
+            case "feign" -> {
+                System.out.println("I am using the feign client");
+                yield organizationFeignClient.getOrganization(organizationId);
+            }
+            default -> organizationRestTemplateClient.getOrganization(organizationId);
+        };
     }
 
     public License createLicense(License license, String organizationId) {
