@@ -7,7 +7,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeoutException;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -61,6 +63,13 @@ public class LicenseController {
             @RequestHeader(value = "Accept-Language", required = false) Locale locale) {
         License license = licenseService.getLicense(licenseId, organizationId, clientType, locale);
         return ResponseEntity.ok(license);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<License>> getLicensesByOrganizationId(
+            @PathVariable("organizationId") String organizationId) throws TimeoutException {
+        List<License> licenses = licenseService.getLicensesByOrganization(organizationId);
+        return ResponseEntity.ok(licenses);
     }
 
     @PutMapping

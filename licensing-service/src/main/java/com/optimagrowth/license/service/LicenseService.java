@@ -7,12 +7,16 @@ import com.optimagrowth.license.repository.LicenseRepository;
 import com.optimagrowth.license.service.client.OrganizationDiscoveryClient;
 import com.optimagrowth.license.service.client.OrganizationFeignClient;
 import com.optimagrowth.license.service.client.OrganizationRestTemplateClient;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
 @Service
 public class LicenseService {
@@ -86,6 +90,31 @@ public class LicenseService {
         };
     }
 
+    /**
+     * For testing @link <a href="http://localhost:8080/actuator/circuitbreakers">circuit breaker</a>
+     */
+    @CircuitBreaker(name = "licenseService")
+    public List<License> getLicensesByOrganization(String organizationId) throws TimeoutException {
+        randomlyRunLong();
+        return licenseRepository.findByOrganizationId(organizationId);
+    }
+
+    // Gives us a one-in-three chance of a database call running long
+    private void randomlyRunLong() throws TimeoutException {
+        Random rand = new Random();
+        int randomNum = rand.nextInt(3) + 1;
+        if (randomNum == 3) sleep();
+    }
+
+    private void sleep() throws TimeoutException {
+        try {
+            Thread.sleep(5000);
+            throw new java.util.concurrent.TimeoutException();
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public License createLicense(License license, String organizationId) {
         License created = null;
 
@@ -111,7 +140,6 @@ public class LicenseService {
     }
 
     public void deleteLicense(String licenseId, String organizationId) {
-        String responseMessage;
         License license = new License();
         license.setLicenseId(licenseId);
         license.setOrganizationId(licenseId);
