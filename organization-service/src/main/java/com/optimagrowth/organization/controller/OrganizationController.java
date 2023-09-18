@@ -24,12 +24,11 @@ public class OrganizationController {
 
     @GetMapping(value = "/{organizationId}")
     public ResponseEntity<Organization> getOrganization(
-            @PathVariable("organizationId") String organizationId,
-            @RequestHeader(value = "Accept-Language", required = false) Locale locale) {
-        Organization organization = organizationService.getOrganization(organizationId, locale);
+            @PathVariable("organizationId") String organizationId) {
+        Organization organization = organizationService.getOrganization(organizationId);
 
         organization.add(
-                linkTo(methodOn(OrganizationController.class).getOrganization(organizationId, locale)).withSelfRel(),
+                linkTo(methodOn(OrganizationController.class).getOrganization(organizationId)).withSelfRel(),
                 linkTo(methodOn(OrganizationController.class).createOrganization(organization, null)).withRel("createLicense"),
                 linkTo(methodOn(OrganizationController.class).updateOrganization(organization, null)).withRel("updateLicense"),
                 linkTo(methodOn(OrganizationController.class).deleteLicense(organizationId, null)).withRel("deleteLicense")

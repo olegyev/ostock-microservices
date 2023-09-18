@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,7 +22,7 @@ public class OrganizationService {
     @Autowired
     private ServiceConfig config;
 
-    public Organization getOrganization(String organizationId, Locale locale) {
+    public Organization getOrganization(String organizationId) {
         Optional<Organization> organization = organizationRepository.findById(organizationId);
         return organization.orElse(null);
     }
