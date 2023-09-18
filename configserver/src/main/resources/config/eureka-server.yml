@@ -1,0 +1,34 @@
+# https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config.files.property-placeholders
+# Property placeholders are replaced in Docker Compose file with the env variables
+
+# NB!
+# Individual services registering with Eureka take up to 30 seconds to
+# show up in the Eureka service. That is because Eureka requires three consecutive
+# heartbeat pings from the service, which are spaced 10 seconds apart,
+# before it will say the service is ready for use.
+
+server:
+  port: 8070
+
+eureka:
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+  client:
+    # Tells the Eureka Server to not cache service registry information locally - only needed on clients
+    fetchRegistry: false
+    # Tells the Eureka Server to not register itself on start up
+    registerWithEureka: false
+    server:
+      # Sets the initial time to wait before the Eureka server takes requests.
+      # By default, it waits 5 minutes to give all the services a chance to register with it before advertising them.
+      # Using this line for local testing helps to speed up the amount of time it takes for the Eureka service to start
+      # and to show the services registered with it.
+      waitTimeInMsWhenSyncEmpty: 5
+    serviceUrl:
+      # Provides the service URL for any client.
+      # Registered services' lookup:
+      # http://<eureka service>:8070/eureka/apps/<APPID>
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+
+

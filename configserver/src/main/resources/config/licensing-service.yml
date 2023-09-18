@@ -1,0 +1,55 @@
+# https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config.files.property-placeholders
+# Property placeholders are replaced in Docker Compose file with the env variables
+
+server:
+  port: 8080
+
+example:
+  property: I AM THE DEFAULT
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+
+spring:
+  database:
+    driverClassName: org.postgresql.Driver
+  datasource:
+    platform: postgres
+    testWhileIdle: true
+    validationQuery: SELECT 1
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: none
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+eureka:
+  server:
+    port: 8070
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+    # Registers the IP address of the service rather than the server name.
+    # By default, Eureka registers the services that contact it by hostname (DNS).
+    # This works well in a server-based environment, where a service is assigned a DNS-backed hostname.
+    # However, in a container-based deployment (for example, Docker), containers are
+    # started with randomly generated hostnames and no DNS entries for the containers.
+    preferIpAddress: true
+  client:
+    # Pulls down a local copy of the registry
+    # Setting this attribute to true caches the registry locally instead of calling the
+    # Eureka service with each lookup. Every 30 seconds, the client software recontacts the
+    # Eureka service for any changes to the registry.
+    fetchRegistry: true
+    # Registers the service with Eureka
+    registerWithEureka: true
+    serviceUrl:
+      # Sets the location of the Eureka service
+      defaultZone: http://${eureka.instance.hostname}:${eureka.server.port}/eureka/

@@ -91,7 +91,8 @@ public class LicenseService {
     }
 
     /**
-     * For testing @link <a href="http://localhost:8080/actuator/circuitbreakers">circuit breaker</a>
+     * For testing
+     * @link <a href="http://localhost:8080/actuator/circuitbreakers">circuit breakers' events endpoint</a>
      */
     @CircuitBreaker(name = "licenseService")
     public List<License> getLicensesByOrganization(String organizationId) throws TimeoutException {
