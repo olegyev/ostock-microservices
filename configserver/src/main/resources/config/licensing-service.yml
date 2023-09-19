@@ -8,11 +8,18 @@ example:
   property: I AM THE DEFAULT
 
 management:
+  endpoint:
+    health:
+      show-details: "ALWAYS"
   endpoints:
     enabled-by-default: true
     web:
       exposure:
         include: '*'
+  # https://stackoverflow.com/a/77062620
+  health:
+    circuitbreakers:
+      enabled: true
 
 spring:
   database:
@@ -53,3 +60,33 @@ eureka:
     serviceUrl:
       # Sets the location of the Eureka service
       defaultZone: http://${eureka.instance.hostname}:${eureka.server.port}/eureka/
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      # Indicates whether to expose the configuration over the /actuator/health endpoint
+      registerHealthIndicator: true
+  instances:
+    # Licensing service instance configuration. (The name given to the circuit breaker in the annotation.)
+    licenseService:
+      # Records the outcome of calls when the CircuitBreaker is CLOSED.
+      # COUNT_BASED = the last slidingWindowSize calls are recorded and aggregated
+      # TIME_BASED = the calls of the last slidingWindowSize seconds recorded and aggregated
+      slidingWindowType: COUNT_BASED
+      slidingWindowSize: 5 # default = 100
+      # After this number of calls CircuitBreaker can calculate the error rate or slow call rate
+      minimumNumberOfCalls: 3 # default = 100
+      permittedNumberOfCallsInHalfOpenState: 3 # default = 10
+      # Sets the time the circuit breaker should wait before changing the status from open to half-open.
+      waitDurationInOpenState: 10s # default = 60,000 ms
+      # In % = failed calls to succeeded calls. If >= then OPEN
+      failureRateThreshold: 10 # default = 50
+      slowCallRateThreshold: 10 # default = 100
+      # If >= then call is considered as slow
+      slowCallDurationThreshold: 2s # default = 60,000 ms
+      # Sets the exceptions that should be recorded as failures
+      recordExceptions: # default = all exceptions
+        - org.springframework.web.client.HttpServerErrorException
+        - java.io.IOException
+        - java.util.concurrent.TimeoutException
+        - org.springframework.web.client.ResourceAccessException
