@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 @Service
@@ -94,7 +91,7 @@ public class LicenseService {
      * For testing
      * @link <a href="http://localhost:8080/actuator/circuitbreakers">circuit breakers' events endpoint</a>
      */
-    @CircuitBreaker(name = "licenseService")
+    @CircuitBreaker(name = "licenseService", fallbackMethod = "buildFallbackLicenseList")
     public List<License> getLicensesByOrganization(String organizationId) throws TimeoutException {
         randomlyRunLong();
         return licenseRepository.findByOrganizationId(organizationId);
@@ -114,6 +111,18 @@ public class LicenseService {
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private List<License> buildFallbackLicenseList(String organizationId, Throwable t) {
+        List<License> fallbackList = new ArrayList<>();
+
+        License fallbackLicense = new License();
+        fallbackLicense.setLicenseId("0000000-00-00000");
+        fallbackLicense.setOrganizationId(organizationId);
+        fallbackLicense.setComment("Sorry, no licensing information currently available");
+
+        fallbackList.add(fallbackLicense);
+        return fallbackList;
     }
 
     public License createLicense(License license, String organizationId) {
