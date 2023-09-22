@@ -1,17 +1,15 @@
-package com.optimagrowth.eureka;
+package com.optimagrowth.gatewayserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 @SpringBootApplication
 @RefreshScope // POST - /actuator/refresh on a target service - updates configs at run-time
-@EnableEurekaServer
-public class EurekaApplication {
+public class ApiGatewayServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(EurekaApplication.class, args);
+        SpringApplication.run(ApiGatewayServerApplication.class, args);
     }
 
 }

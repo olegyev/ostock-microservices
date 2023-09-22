@@ -16,7 +16,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import java.util.Locale;
 
 @SpringBootApplication
-@RefreshScope // POST - /actuator/refresh on a target service
+@RefreshScope // POST - /actuator/refresh on a target service - updates configs at run-time
 @EnableDiscoveryClient
 @EnableFeignClients
 public class LicenseServiceApplication {

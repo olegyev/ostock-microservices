@@ -29,6 +29,3 @@ eureka:
       # Registered services' lookup:
       # http://<eureka service>:8070/eureka/apps/<APPID>
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
-
-
-

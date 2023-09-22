@@ -61,6 +61,7 @@ eureka:
       # Sets the location of the Eureka service
       defaultZone: http://${eureka.instance.hostname}:${eureka.server.port}/eureka/
 
+# https://resilience4j.readme.io/docs/circuitbreaker#create-and-configure-a-circuitbreaker
 resilience4j.circuitbreaker:
   configs:
     default:

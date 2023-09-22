@@ -11,7 +11,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import java.util.Locale;
 
 @SpringBootApplication
-@RefreshScope // POST - /actuator/refresh on a target service
+@RefreshScope // POST - /actuator/refresh on a target service - updates configs at run-time
 public class OrganizationServiceApplication {
 
     public static void main(String[] args) {

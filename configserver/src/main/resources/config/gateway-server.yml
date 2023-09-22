@@ -1,0 +1,66 @@
+# https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config.files.property-placeholders
+# Property placeholders are replaced in Docker Compose file with the env variables
+
+server:
+  port: 8072
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+
+eureka:
+  server:
+    port: 8070
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+    # Registers the IP address of the service rather than the server name.
+    # By default, Eureka registers the services that contact it by hostname (DNS).
+    # This works well in a server-based environment, where a service is assigned a DNS-backed hostname.
+    # However, in a container-based deployment (for example, Docker), containers are
+    # started with randomly generated hostnames and no DNS entries for the containers.
+    preferIpAddress: true
+  client:
+    # Pulls down a local copy of the registry
+    # Setting this attribute to true caches the registry locally instead of calling the
+    # Eureka service with each lookup. Every 30 seconds, the client software recontacts the
+    # Eureka service for any changes to the registry.
+    fetchRegistry: true
+    # Registers the service with Eureka
+    registerWithEureka: true
+    serviceUrl:
+      # Sets the location of the Eureka service
+      defaultZone: http://${eureka.instance.hostname}:${eureka.server.port}/eureka/
+
+spring:
+  cloud:
+    # To see registered routes:
+    # http://localhost:8072/actuator/gateway/routes
+    # NB!
+    # For automated routing, if no service instances are running (i.e. registered in Eureka),
+    # the gateway will not expose the route for the service.
+    # For manual routing, the gateway will still show the route
+    # and return 500 HTTP error if trying to access a non-running/non-registered in Eureka service.
+    gateway:
+      # Automated routing:
+      # first path variable = service ID as it is registered within Eureka (spring.application.name of a service).
+      # E.g. http://localhost:8072/organization-service/v1/organization/958aa1bf-18dc-405c-b84a-b69f04d98d4f
+      # Here, 'organization-service' is used to automatically locate a service based on Eureka registry.
+      # This approach is useful for a large environments with a big number of services being added often.
+      discovery.locator:
+        enabled: true
+        lowerCaseServiceId: true
+      # Manual routing:
+      # fine-grained, allows to hide internal details of architecture.
+      # This approach is useful in a stable environment where not many new services are added.
+      routes:
+        - id: organization-service # Optional. Can be any value
+          uri: lb://organization-service # Service name in Eureka registry
+          predicates:
+            - Path=/organization/**
+          # Rewrites the request path, from /organization/** to /**,
+          # by taking the path regexp as a parameter and a replacement order
+          filters:
+            - RewritePath=/organization/(?<path>.*), /$\{path}

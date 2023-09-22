@@ -50,6 +50,24 @@ services:
         aliases:
           - "eurekaserver"
 
+  gatewayserver:
+    image: ostock/gatewayserver:0.0.1-SNAPSHOT
+    ports:
+      - "8072:8072"
+    environment:
+      SPRING_PROFILES_ACTIVE: "dev"
+      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
+      EUREKA_INSTANCE_HOSTNAME: "eurekaserver"
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "gatewayserver"
+
   organizationservice:
     image: ostock/organization-service:0.0.1-SNAPSHOT
     ports:
