@@ -4,6 +4,12 @@
 server:
   port: 8072
 
+logging:
+  level:
+    com.netflix: WARN
+    org.springframework.web: WARN
+    com.optimagrowth: DEBUG
+
 management:
   endpoints:
     enabled-by-default: true
