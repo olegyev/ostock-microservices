@@ -7,7 +7,10 @@ import com.optimagrowth.license.repository.LicenseRepository;
 import com.optimagrowth.license.service.client.OrganizationDiscoveryClient;
 import com.optimagrowth.license.service.client.OrganizationFeignClient;
 import com.optimagrowth.license.service.client.OrganizationRestTemplateClient;
+import com.optimagrowth.license.utils.UserContextHolder;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,8 @@ import java.util.concurrent.TimeoutException;
 
 @Service
 public class LicenseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(LicenseService.class);
 
     @Autowired
     private MessageSource messages;
@@ -57,6 +62,12 @@ public class LicenseService {
                     organizationId));
         }
 
+        logger.debug("Getting License with Organization info: UserContextFilter Correlation id: {}," +
+                        "License ID: {}, Organization ID: {}",
+                UserContextHolder.getContext().getCorrelationId(),
+                licenseId,
+                organizationId);
+
         Organization organization = retrieveOrganizationInfo(organizationId, clientType);
 
         if (null != organization) {
@@ -89,6 +100,7 @@ public class LicenseService {
 
     /**
      * For testing
+     *
      * @link <a href="http://localhost:8080/actuator/circuitbreakers">circuit breakers' events endpoint</a>
      */
     @CircuitBreaker(name = "licenseService", fallbackMethod = "buildFallbackLicenseList")
