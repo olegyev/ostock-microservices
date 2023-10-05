@@ -68,6 +68,19 @@ services:
         aliases:
           - "gatewayserver"
 
+  keycloak:
+    image: jboss/keycloak:16.1.1
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    restart: always
+    networks:
+      backend:
+        aliases:
+          - "keycloak"
+
   organizationservice:
     image: ostock/organization-service:0.0.1-SNAPSHOT
     ports:
@@ -90,7 +103,7 @@ services:
   licensingservice:
     image: ostock/licensing-service:0.0.1-SNAPSHOT
     ports:
-      - "8080:8080"
+      - "8180:8080"
     environment:
       SPRING_PROFILES_ACTIVE: "dev"
       SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
