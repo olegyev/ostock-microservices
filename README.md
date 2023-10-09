@@ -1,9 +1,11 @@
 # ostock-microservices
+
 Training project for microservices with Spring Cloud
 
 <link>https://github.com/ihuaylupo/manning-smia/tree/master</link>
 
 ## Build and run:
+
 <ol>
   <li><b>Run config server first.</b> </br>
       From <a href="https://github.com/olegyev/ostock-microservices/tree/master/configserver">config repo</a>, build a Docker image: </br>
@@ -37,3 +39,29 @@ Training project for microservices with Spring Cloud
     <code>docker system df</code> - to ensure that resources are freed up </br>
   </li>
 </ol>
+
+<b>NB!</b> </br>
+To get access JWT for predefined user, we have to execute following HTTP call
+from within our container's network, since "iss" (i.e. issuer) attribute in JWT should be the same
+as called Keycloak Authorization Server URI. </br>
+See: https://stackoverflow.com/questions/72854439/iss-claim-not-valid-keycloak </br>
+
+Follow the steps below:
+<ol>
+    <li>
+        Enter organization-service container: </br>
+        <code>docker exec -it docker-organizationservice-1 /bin/sh</code>
+    </li>
+    <li>
+        There, install curl tool: </br>
+        <code>apt-get update; apt-get install -y curl</code>
+    </li>
+    <li>
+        After that, execute the following curl call: </br>
+        <code>curl --location 'http://keycloak:8080/realms/MyAppRealm/protocol/openid-connect/token' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'username=user.admin' --data-urlencode 'password=1234567890' --data-urlencode 'grant_type=password' --data-urlencode 'client_id=Ostock' --data-urlencode 'client_secret=**********' --data-urlencode 'scope=openid'</code>
+    </li>
+</ol>
+
+You can regenerate client_secret from within the Keycloak UI admin panel: </br>
+http://localhost:8080/ -> Clients -> Ostock -> Credentials -> Client secret -> Regenerate </br>
+After that, replace above curl call's 'client_secret' attribute with the new value.
