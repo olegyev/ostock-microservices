@@ -15,9 +15,11 @@ public class UserContext {
     public static final String AUTH_TOKEN = "tmx-auth-token";
     public static final String USER_ID = "tmx-user-id";
     public static final String ORGANIZATION_ID = "tmx-organization-id";
+    public static final String JWT_KEYCLOAK = "Authorization";
 
     private String correlationId = "";
     private String authToken = "";
     private String userId = "";
     private String organizationId = "";
+    private String jwtKeycloak = "";
 }

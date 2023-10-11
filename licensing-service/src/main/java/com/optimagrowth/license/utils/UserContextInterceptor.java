@@ -1,5 +1,7 @@
 package com.optimagrowth.license.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -14,6 +16,8 @@ import java.io.IOException;
 
 public class UserContextInterceptor implements ClientHttpRequestInterceptor {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserContextInterceptor.class);
+
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         HttpHeaders headers = request.getHeaders();
@@ -25,6 +29,14 @@ public class UserContextInterceptor implements ClientHttpRequestInterceptor {
         headers.add(UserContext.AUTH_TOKEN,
                 UserContextHolder.getContext().
                         getAuthToken());
+
+        headers.add(UserContext.JWT_KEYCLOAK,
+                UserContextHolder.getContext().
+                        getJwtKeycloak());
+
+        logger.debug("OUTBOUND REQUEST: UserContextFilter Correlation ID: {}, JWT: {}",
+                UserContextHolder.getContext().getCorrelationId(),
+                UserContextHolder.getContext().getJwtKeycloak());
 
         return execution.execute(request, body);
     }

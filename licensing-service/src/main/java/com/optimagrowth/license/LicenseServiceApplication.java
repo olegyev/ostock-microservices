@@ -64,7 +64,8 @@ public class LicenseServiceApplication {
         List<ClientHttpRequestInterceptor> outgoingRequestsInterceptors =
                 restTemplate.getInterceptors();
 
-        // To pass correlation ID for tracing to the calling service
+        // To pass outbound request's data (correlation ID, Keycloak JWT, etc.)
+        // for tracing to the calling service
         outgoingRequestsInterceptors.add(new UserContextInterceptor());
 
         restTemplate.setInterceptors(outgoingRequestsInterceptors);

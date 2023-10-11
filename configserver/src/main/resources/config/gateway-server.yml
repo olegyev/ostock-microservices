@@ -62,6 +62,15 @@ spring:
       # fine-grained, allows to hide internal details of architecture.
       # This approach is useful in a stable environment where not many new services are added.
       routes:
+        - id: licensing-service # Optional. Can be any value
+          uri: lb://licensing-service # Service name in Eureka registry
+          predicates:
+            - Path=/licensing/**
+          # Rewrites the request path, from /licensing/** to /**,
+          # by taking the path regexp as a parameter and a replacement order
+          filters:
+            - RewritePath=/licensing/(?<path>.*), /$\{path}
+            - RemoveRequestHeader=Cookie,Set-Cookie # By default, Cookie, Set-Cookie, and Authorization are removed
         - id: organization-service # Optional. Can be any value
           uri: lb://organization-service # Service name in Eureka registry
           predicates:
@@ -70,3 +79,4 @@ spring:
           # by taking the path regexp as a parameter and a replacement order
           filters:
             - RewritePath=/organization/(?<path>.*), /$\{path}
+            - RemoveRequestHeader=Cookie,Set-Cookie # By default, Cookie, Set-Cookie, and Authorization are removed

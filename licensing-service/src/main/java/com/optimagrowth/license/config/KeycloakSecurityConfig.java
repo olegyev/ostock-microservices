@@ -1,4 +1,4 @@
-package com.optimagrowth.organization.config;
+package com.optimagrowth.license.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,7 @@ import java.util.Map;
 public class KeycloakSecurityConfig {
 
     /**
-     * @see config/organization-service.yml#security.oauth2.resourceserver.jwt
+     * @see config/licensing-service.yml#security.oauth2.resourceserver.jwt
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {

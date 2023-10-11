@@ -34,8 +34,12 @@ public class UserContextFilter implements Filter {
         UserContextHolder.getContext().setOrganizationId(
                 httpServletRequest.getHeader(UserContext.ORGANIZATION_ID));
 
-        logger.debug("UserContextFilter Correlation id: {}",
-                UserContextHolder.getContext().getCorrelationId());
+        UserContextHolder.getContext().setJwtKeycloak(
+                httpServletRequest.getHeader(UserContext.JWT_KEYCLOAK));
+
+        logger.debug("INBOUND REQUEST: UserContextFilter Correlation ID: {}, JWT: {}",
+                UserContextHolder.getContext().getCorrelationId(),
+                UserContextHolder.getContext().getJwtKeycloak());
 
         filterChain.doFilter(httpServletRequest, servletResponse);
     }

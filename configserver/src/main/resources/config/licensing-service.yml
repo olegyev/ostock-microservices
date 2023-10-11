@@ -2,7 +2,7 @@
 # Property placeholders are replaced in Docker Compose file with the env variables
 
 server:
-  port: 8080
+  port: 8180
 
 example:
   property: I AM THE DEFAULT
@@ -43,6 +43,45 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+  # Once we set up the organization service as a Resource Server ( protected resource, according to OAuth 2.0),
+  # every time a call is made to the service, the caller must include the authentication HTTP header
+  # containing a Bearer access token to the service.
+  # Our Resource Server then has to call back to the Keycloak server as an Authorization Server
+  # to see if the token is valid.
+  #
+  # For Keycloak Authorization Server details, see:
+  # http://localhost:8080/auth/realms/spmia-realm/.well-known/openid-configuration
+  #
+  # For Spring Boot 3 Resource Server + Keycloak OAuth 2.0 Authorization Server configs, see:
+  # https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html
+  # https://medium.com/@rickors560/securing-spring-boot-3-1-0-applications-with-spring-security-and-keycloak-21-e694c6f5617d
+  #
+  # To get access JWT for predefined user, we have to execute following HTTP call
+  # from within our container's network, since "iss" (i.e. issuer) attribute in JWT should be the same
+  # as called Keycloak Authorization Server URI (see below: security.oauth2.resourceserver.jwt.issuer-uri).
+  # See: https://stackoverflow.com/questions/72854439/iss-claim-not-valid-keycloak
+  #
+  # N.B.
+  # Follow the steps below:
+  # 1. Enter organization-service container:
+  # docker exec -it docker-organizationservice-1 /bin/sh
+  # 2. There, install curl tool:
+  # apt-get update; apt-get install -y curl
+  # 3. After that, execute the following curl call:
+  # curl --location 'http://keycloak:8080/realms/MyAppRealm/protocol/openid-connect/token' \
+  # --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'username=user.admin' \
+  # --data-urlencode 'password=1234567890' --data-urlencode 'grant_type=password' --data-urlencode \
+  # 'client_id=Ostock' --data-urlencode 'client_secret=**********' --data-urlencode 'scope=openid'
+  #
+  # You can regenerate client_secret from within the Keycloak UI admin panel:
+  # http://localhost:8080/ -> Clients -> Ostock -> Credentials -> Client secret -> Regenerate
+  # After that, replace above curl call's 'client_secret' attribute with the new value.
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/MyAppRealm}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/MyAppRealm/protocol/openid-connect/certs}
 
 eureka:
   server:
