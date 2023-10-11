@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.8'
 services:
   database:
     image: postgres:16rc1-bullseye
@@ -110,12 +110,14 @@ services:
   licensingservice:
     image: ostock/licensing-service:0.0.1-SNAPSHOT
     ports:
-      - "8180:8080"
+      - "8180:8180"
     environment:
       SPRING_PROFILES_ACTIVE: "dev"
       SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://database:5432/ostock_dev"
       EUREKA_INSTANCE_HOSTNAME: "eurekaserver"
+      KEYCLOAK_ISSUER_URI: "http://keycloak:8080/realms/MyAppRealm"
+      KEYCLOAK_JWK_SET_URI: "http://keycloak:8080/realms/MyAppRealm/protocol/openid-connect/certs"
     depends_on:
       database:
         condition: service_healthy
