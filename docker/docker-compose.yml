@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   database:
     image: postgres:16rc1-bullseye
@@ -85,6 +86,67 @@ services:
       backend:
         aliases:
           - "keycloak"
+
+  # https://www.baeldung.com/ops/kafka-docker-setup
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.1
+    ports:
+      - "22181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      backend:
+        aliases:
+          - "zookeeper"
+
+  # https://www.baeldung.com/ops/kafka-docker-setup
+  kafkaserver:
+    image: confluentinc/cp-kafka:7.5.1
+    ports:
+      - "29092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkaserver:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_MIN_INSYNC_REPLICAS: 1
+    depends_on:
+      zookeeper:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "kafkaserver"
+
+  # Creates 2 Kafka topics (dresses, ratings) when Kafka server is launched
+  # See: https://stackoverflow.com/a/69534299
+  # To check topics, run:
+  #   docker exec -it docker-kafkaserver-1 /bin/sh
+  #   kafka-topics --bootstrap-server kafkaserver:9092 --list
+  kafkaserverinit:
+    image: confluentinc/cp-kafka:7.5.1
+    depends_on:
+      kafkaserver:
+        condition: service_started
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      kafka-topics --bootstrap-server kafkaserver:9092 --list
+      
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafkaserver:9092 --create --if-not-exists --topic dresses --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server kafkaserver:9092 --create --if-not-exists --topic ratings --replication-factor 1 --partitions 1
+      
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafkaserver:9092 --list
+      "
+    networks:
+      backend:
+        aliases:
+          - "kafkaserverinit"
 
   organizationservice:
     image: ostock/organization-service:0.0.1-SNAPSHOT
