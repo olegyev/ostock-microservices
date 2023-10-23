@@ -36,6 +36,8 @@ Training project for microservices with Spring Cloud
     To free up resources, run: </br>
     <code>docker image prune</code> - to prune dangling images </br>
     <code>docker volume prune</code> - to prune dangling volumes </br>
+    <code>docker network prune</code> - to prune dangling networks </br>
+    <code>docker builder prune</code> - to prune builder </br>
     <code>docker system df</code> - to ensure that resources are freed up </br>
   </li>
 </ol>
