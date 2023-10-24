@@ -148,6 +148,15 @@ services:
         aliases:
           - "kafkaserverinit"
 
+  redisserver:
+    image: redis:7.2.2-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      backend:
+        aliases:
+          - "redisserver"
+
   organizationservice:
     image: ostock/organization-service:0.0.1-SNAPSHOT
     ports:
