@@ -16,7 +16,7 @@ import java.util.Map;
 public class KeycloakSecurityConfig {
 
     /**
-     * @see config/organization-service.yml#security.oauth2.resourceserver.jwt
+     * @see config/organization-service.yml#spring.security.oauth2.resourceserver.jwt
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {

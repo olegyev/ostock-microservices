@@ -72,7 +72,19 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        <!-- See: configserver/src/main/resources/config/organization-service.yml#security.oauth2.resourceserver.jwt -->
+        <!-- See: configserver/src/main/resources/config/organization-service.yml#spring.security.oauth2.resourceserver.jwt -->
+
+        <!-- Spring Cloud Stream Kafka binder -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-kafka</artifactId>
+        </dependency>
+        <!-- See: configserver/src/main/resources/config/organization-service.yml#spring.cloud.stream -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

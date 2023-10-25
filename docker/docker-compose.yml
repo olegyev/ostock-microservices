@@ -121,33 +121,6 @@ services:
         aliases:
           - "kafkaserver"
 
-  # Creates 2 Kafka topics (dresses, ratings) when Kafka server is launched
-  # See: https://stackoverflow.com/a/69534299
-  # To check topics, run:
-  #   docker exec -it docker-kafkaserver-1 /bin/sh
-  #   kafka-topics --bootstrap-server kafkaserver:9092 --list
-  kafkaserverinit:
-    image: confluentinc/cp-kafka:7.5.1
-    depends_on:
-      kafkaserver:
-        condition: service_started
-    entrypoint: [ '/bin/sh', '-c' ]
-    command: |
-      "
-      kafka-topics --bootstrap-server kafkaserver:9092 --list
-      
-      echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafkaserver:9092 --create --if-not-exists --topic dresses --replication-factor 1 --partitions 1
-      kafka-topics --bootstrap-server kafkaserver:9092 --create --if-not-exists --topic ratings --replication-factor 1 --partitions 1
-      
-      echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafkaserver:9092 --list
-      "
-    networks:
-      backend:
-        aliases:
-          - "kafkaserverinit"
-
   redisserver:
     image: redis:7.2.2-alpine
     ports:

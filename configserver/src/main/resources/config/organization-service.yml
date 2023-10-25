@@ -75,6 +75,19 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/MyAppRealm}
           jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/MyAppRealm/protocol/openid-connect/certs}
+  # See:
+  # https://www.youtube.com/watch?app=desktop&v=vo6RBevVugE
+  # https://github.com/himanshuntwk/spring-projects/blob/main/kafka-binder-demo/src/main/resources/application.yml
+  # https://spring.io/guides/gs/spring-cloud-stream/
+  cloud:
+    stream:
+      bindings:
+        producerBinding-out-0:
+          destination: organization-topic # Kafka topic name
+      kafka:
+        binder:
+          brokers:
+            - kafkaserver:9092
 
 eureka:
   server:

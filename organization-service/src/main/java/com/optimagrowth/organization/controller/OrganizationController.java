@@ -1,5 +1,7 @@
 package com.optimagrowth.organization.controller;
 
+import com.optimagrowth.organization.events.model.ActionEnum;
+import com.optimagrowth.organization.events.producer.OrganizationChangeSource;
 import com.optimagrowth.organization.model.Organization;
 import com.optimagrowth.organization.service.OrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +24,15 @@ public class OrganizationController {
     @Autowired
     private OrganizationService organizationService;
 
+    @Autowired
+    private OrganizationChangeSource organizationChangeSource;
+
     @GetMapping(value = "/{organizationId}")
     public ResponseEntity<Organization> getOrganization(
             @PathVariable("organizationId") String organizationId) {
         Organization organization = organizationService.getOrganization(organizationId);
+
+        if (organization == null) return ResponseEntity.ok(null);
 
         organization.add(
                 linkTo(methodOn(OrganizationController.class).getOrganization(organizationId)).withSelfRel(),
@@ -33,6 +40,8 @@ public class OrganizationController {
                 linkTo(methodOn(OrganizationController.class).updateOrganization(organization, null)).withRel("updateLicense"),
                 linkTo(methodOn(OrganizationController.class).deleteLicense(organizationId, null)).withRel("deleteLicense")
         );
+
+        organizationChangeSource.delegateOrganizationChangeEventSupplier(organizationId, ActionEnum.GET);
 
         return ResponseEntity.ok(organization);
     }
