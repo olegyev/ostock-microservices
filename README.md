@@ -52,7 +52,7 @@ Follow the steps below:
 <ol>
     <li>
         Enter organization-service container: </br>
-        <code>docker exec -it docker-organizationservice-1 /bin/sh</code>
+        <code>docker exec -it docker-organizationservice-1 /bin/bash</code>
     </li>
     <li>
         There, install curl tool: </br>
