@@ -83,7 +83,7 @@ spring:
     stream:
       bindings:
         producerBinding-out-0:
-          destination: organization-topic # Kafka topic name
+          destination: organization-topic # Kafka topic name to write to
       kafka:
         binder:
           brokers:

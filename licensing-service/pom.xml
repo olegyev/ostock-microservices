@@ -80,6 +80,18 @@
         </dependency>
         <!-- See: configserver/src/main/resources/config/licensing-service.yml#security.oauth2.resourceserver.jwt -->
 
+        <!-- Spring Cloud Stream Kafka binder -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-kafka</artifactId>
+        </dependency>
+        <!-- See: configserver/src/main/resources/config/licensing-service.yml#spring.cloud.stream -->
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>

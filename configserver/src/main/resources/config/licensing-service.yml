@@ -82,6 +82,24 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/MyAppRealm}
           jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/MyAppRealm/protocol/openid-connect/certs}
+  # See:
+  # https://www.youtube.com/watch?app=desktop&v=vo6RBevVugE
+  # https://github.com/himanshuntwk/spring-projects/blob/main/kafka-binder-demo/src/main/resources/application.yml
+  # https://spring.io/guides/gs/spring-cloud-stream/
+  cloud:
+    function:
+      # See: https://docs.spring.io/spring-cloud-function/docs/current/reference/html/spring-cloud-function.html#_function_definition
+      # See: licensing-service#src.main.java.com.optimagrowth.license.events.sink.OrganizationChangeSink#sinkBinding
+      definition: sinkBinding
+    stream:
+      bindings:
+        # See: https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream.html#_functional_binding_names
+        sinkBinding-in-0:
+          destination: organization-topic # Kafka topic name to read from
+      kafka:
+        binder:
+          brokers:
+            - kafkaserver:9092
 
 eureka:
   server:
