@@ -39,7 +39,6 @@ public class OrganizationService {
         organization.setId(UUID.randomUUID().toString());
         organization = organizationRepository.save(organization);
         return organization;
-
     }
 
     public Organization update(Organization organization) {

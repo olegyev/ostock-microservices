@@ -41,7 +41,8 @@ public class OrganizationController {
                 linkTo(methodOn(OrganizationController.class).deleteLicense(organizationId, null)).withRel("deleteLicense")
         );
 
-        organizationChangeSource.delegateOrganizationChangeEventSupplier(organizationId, ActionEnum.GET);
+        // Uncomment if you want to test a Kafka pub/sub in more near-real-time mode
+        // organizationChangeSource.delegateOrganizationChangeEventSupplier(organizationId, ActionEnum.GET);
 
         return ResponseEntity.ok(organization);
     }
@@ -53,6 +54,9 @@ public class OrganizationController {
         Organization updated = organizationService.update(requestBody);
         String message = messages.getMessage("organization.update.message", null, locale);
         String responseMessage = String.format(message, updated);
+
+        organizationChangeSource.delegateOrganizationChangeEventSupplier(updated.getId(), ActionEnum.UPDATED);
+
         return ResponseEntity.ok(responseMessage);
     }
 
@@ -63,6 +67,9 @@ public class OrganizationController {
         Organization created = organizationService.create(requestBody);
         String message = messages.getMessage("organization.create.message", null, locale);
         String responseMessage = String.format(message, created);
+
+        organizationChangeSource.delegateOrganizationChangeEventSupplier(created.getId(), ActionEnum.CREATED);
+
         return ResponseEntity.ok(responseMessage);
     }
 
@@ -73,6 +80,9 @@ public class OrganizationController {
         organizationService.delete(organizationId);
         String message = messages.getMessage("organization.delete.message", null, locale);
         String responseMessage = String.format(message, organizationId);
+
+        organizationChangeSource.delegateOrganizationChangeEventSupplier(organizationId, ActionEnum.DELETED);
+
         return ResponseEntity.ok(responseMessage);
     }
 }
