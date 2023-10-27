@@ -4,6 +4,7 @@ import com.optimagrowth.license.events.model.OrganizationChangeModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 
@@ -22,11 +23,15 @@ public class OrganizationChangeSink {
     /**
      * @see config/licensing-service.yml#spring.cloud.stream.bindings
      * See <a href="https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream.html#_functional_binding_names">docs</a>
+     * <p>
+     * Why List<?>,
+     * see: <a href="https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream-binder-kafka.html#_consuming_batches">docs</>
      */
     @Bean
-    public Consumer<OrganizationChangeModel> sinkBinding() {
-        return event -> {
-            System.out.println("Received from Kafka topic: " + event);
+    public Consumer<List<OrganizationChangeModel>> sinkBinding() {
+        return events -> {
+            System.out.println("Sinking Kafka records:");
+            events.forEach(System.out::println);
         };
     }
 }

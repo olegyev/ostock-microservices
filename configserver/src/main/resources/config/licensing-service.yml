@@ -96,10 +96,19 @@ spring:
         # See: https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream.html#_functional_binding_names
         sinkBinding-in-0:
           destination: organization-topic # Kafka topic name to read from
+          consumer:
+            # See: https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream-binder-kafka.html#_consuming_batches
+            batch-mode: true
       kafka:
         binder:
           brokers:
             - ${KAFKA_BROKER_URL:localhost:29092}
+          configuration:
+            # If batch is >2KB (~6 records) and <= 10 records (i.e. 6-10 records inclusive), fetches immediately,
+            # otherwise fetches after 30s delay
+            max.poll.records: 10
+            fetch.min.bytes: 2000 # 2KB ~ 6 records
+            fetch.max.wait.ms: 30000 # 30s
 
 eureka:
   server:
