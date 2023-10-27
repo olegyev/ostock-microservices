@@ -96,6 +96,9 @@ spring:
         # See: https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream.html#_functional_binding_names
         sinkBinding-in-0:
           destination: organization-topic # Kafka topic name to read from
+          # https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream.html#consumer-groups
+          # Only one copy of the record will be consumed by a service instance belonging to the group
+          group: licensing-service
           consumer:
             # See: https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream-binder-kafka.html#_consuming_batches
             batch-mode: true
@@ -104,8 +107,10 @@ spring:
           brokers:
             - ${KAFKA_BROKER_URL:localhost:29092}
           configuration:
-            # If batch is >2KB (~6 records) and <= 10 records (i.e. 6-10 records inclusive), fetches immediately,
-            # otherwise fetches after 30s delay
+            # If records' batch is >2KB (~6 records) and <= 10 records (i.e. 6-10 records inclusive), fetches immediately,
+            # otherwise fetches after 30s delay.
+            # By default, the sink (consumer) method (licensing-service#src.main.java.com.optimagrowth.license.events.sink.OrganizationChangeSink#sinkBinding)
+            # will be called with one record at a time.
             max.poll.records: 10
             fetch.min.bytes: 2000 # 2KB ~ 6 records
             fetch.max.wait.ms: 30000 # 30s
