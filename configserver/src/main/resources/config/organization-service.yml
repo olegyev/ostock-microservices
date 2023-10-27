@@ -87,7 +87,7 @@ spring:
       kafka:
         binder:
           brokers:
-            - kafkaserver:9092
+            - ${KAFKA_BROKER_URL:localhost:29092}
 
 eureka:
   server:
