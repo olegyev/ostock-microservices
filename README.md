@@ -67,3 +67,21 @@ Follow the steps below:
 You can regenerate client_secret from within the Keycloak UI admin panel: </br>
 http://localhost:8080/ -> Clients -> Ostock -> Credentials -> Client secret -> Regenerate </br>
 After that, replace above curl call's 'client_secret' attribute with the new value.
+
+<b>NB!</b> </br>
+To get a message from a Kafka topic: </br>
+
+<ol>
+    <li>
+        Enter kafka-server container: </br>
+        <code>docker exec -it docker-kafkaserver-1 /bin/bash</code>
+    </li>
+    <li>
+        List Kafka topics: </br>
+        <code>kafka-topics --bootstrap-server kafkaserver:9092 --list</code>
+    </li>
+    <li>
+        List records in a topic: </br>
+        <code>kafka-console-consumer --bootstrap-server kafkaserver:9092 --topic organization-topic --from-beginning --max-messages 1</code>
+    </li>
+</ol>
