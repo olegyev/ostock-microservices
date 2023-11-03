@@ -164,6 +164,8 @@ services:
       KEYCLOAK_ISSUER_URI: "http://keycloak:8080/realms/MyAppRealm"
       KEYCLOAK_JWK_SET_URI: "http://keycloak:8080/realms/MyAppRealm/protocol/openid-connect/certs"
       KAFKA_BROKER_URL: "kafkaserver:9092"
+      REDIS_HOST: "redisserver"
+      REDIS_PORT: "6379"
     depends_on:
       database:
         condition: service_healthy

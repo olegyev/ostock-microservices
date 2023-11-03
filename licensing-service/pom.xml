@@ -118,6 +118,13 @@
             <artifactId>postgresql</artifactId>
         </dependency>
 
+        <!-- Spring Data Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- See: https://www.baeldung.com/spring-data-redis-tutorial#maven-dependencies -->
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

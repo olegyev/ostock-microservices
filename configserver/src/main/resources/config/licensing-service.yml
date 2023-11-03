@@ -168,3 +168,7 @@ resilience4j.circuitbreaker:
         - java.io.IOException
         - java.util.concurrent.TimeoutException
         - org.springframework.web.client.ResourceAccessException
+
+redis:
+  hostName: ${REDIS_HOST:localhost}
+  port: ${REDIS_PORT:6379}

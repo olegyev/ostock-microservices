@@ -1,6 +1,8 @@
 package com.optimagrowth.license;
 
+import com.optimagrowth.license.config.RedisConfig;
 import com.optimagrowth.license.utils.UserContextInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -10,6 +12,10 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
@@ -23,6 +29,9 @@ import java.util.Locale;
 @EnableDiscoveryClient
 @EnableFeignClients
 public class LicenseServiceApplication {
+
+    @Autowired
+    private RedisConfig redisConfig;
 
     public static void main(String[] args) {
         SpringApplication.run(LicenseServiceApplication.class, args);
@@ -71,5 +80,30 @@ public class LicenseServiceApplication {
         restTemplate.setInterceptors(outgoingRequestsInterceptors);
 
         return restTemplate;
+    }
+
+    /**
+     * Redis
+     * See <a href="https://docs.spring.io/spring-data/data-redis/docs/current/reference/html/#redis.repositories.usage">docs</a>
+     * See <a href="https://www.baeldung.com/spring-data-redis-tutorial">tutorial</a>
+     * <p>
+     * Lettuce client is used, instead of Jedis, because it is default for spring-boot-starter-data-redis
+     */
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        String redisHostName = redisConfig.getHostName();
+        int redisPort = Integer.parseInt(redisConfig.getPort());
+
+        RedisStandaloneConfiguration redisStandaloneConfiguration
+                = new RedisStandaloneConfiguration(redisHostName, redisPort);
+
+        return new LettuceConnectionFactory(redisStandaloneConfiguration);
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
+        return template;
     }
 }

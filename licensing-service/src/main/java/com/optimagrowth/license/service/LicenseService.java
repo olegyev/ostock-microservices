@@ -4,9 +4,7 @@ import com.optimagrowth.license.config.ServiceConfig;
 import com.optimagrowth.license.model.License;
 import com.optimagrowth.license.model.Organization;
 import com.optimagrowth.license.repository.LicenseRepository;
-import com.optimagrowth.license.service.client.OrganizationDiscoveryClient;
-import com.optimagrowth.license.service.client.OrganizationFeignClient;
-import com.optimagrowth.license.service.client.OrganizationRestTemplateClient;
+import com.optimagrowth.license.service.client.*;
 import com.optimagrowth.license.utils.UserContextHolder;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
@@ -33,13 +31,10 @@ public class LicenseService {
     private ServiceConfig config;
 
     @Autowired
-    private OrganizationFeignClient organizationFeignClient;
+    private OrganizationRedisClient organizationRedisClient;
 
     @Autowired
-    private OrganizationRestTemplateClient organizationRestTemplateClient;
-
-    @Autowired
-    private OrganizationDiscoveryClient organizationDiscoveryClient;
+    private OrganizationRestClientFactory organizationRestClientFactory;
 
     public License getLicense(String licenseId, String organizationId, Locale locale) {
         License license = licenseRepository.findByOrganizationIdAndLicenseId(organizationId, licenseId);
@@ -81,27 +76,33 @@ public class LicenseService {
     }
 
     private Organization retrieveOrganizationInfo(String organizationId, String clientType) {
-        return switch (clientType) {
-            case "discovery" -> {
-                System.out.println("I am using the discovery client");
-                yield organizationDiscoveryClient.getOrganization(organizationId);
-            }
-            case "rest" -> {
-                System.out.println("I am using the rest client");
-                yield organizationRestTemplateClient.getOrganization(organizationId);
-            }
-            case "feign" -> {
-                System.out.println("I am using the feign client");
-                yield organizationFeignClient.getOrganization(organizationId);
-            }
-            default -> organizationRestTemplateClient.getOrganization(organizationId);
-        };
+        logger.debug("In licensing-service#retrieveOrganizationInfo: {}",
+                UserContextHolder.getContext().getCorrelationId());
+
+        // First, check Redis cache
+        Organization organizationRetrieved = organizationRedisClient.checkRedisCache(organizationId);
+
+        // If found in Redis cache, then return
+        if (organizationRetrieved != null) {
+            logger.debug("Successfully retrieved Organization from the Redis cache: {}", organizationRetrieved);
+            return organizationRetrieved;
+        }
+
+        // If not found in Redis cache, get it via REST client
+        logger.debug("Unable to locate Organization from the Redis cache: {}", organizationId);
+        organizationRetrieved = organizationRestClientFactory.retrieveOrganizationInfo(organizationId, clientType);
+
+        // ...and cache in Redis
+        if (organizationRetrieved != null) {
+            organizationRedisClient.cacheOrganization(organizationRetrieved);
+        }
+
+        return organizationRetrieved;
     }
 
     /**
-     * For testing
-     *
-     * @link <a href="http://localhost:8080/actuator/circuitbreakers">circuit breakers' events endpoint</a>
+     * For testing, use:
+     * http://licensing-service/actuator/circuitbreakers
      */
     @CircuitBreaker(name = "licenseService", fallbackMethod = "buildFallbackLicenseList")
     public List<License> getLicensesByOrganization(String organizationId) throws TimeoutException {

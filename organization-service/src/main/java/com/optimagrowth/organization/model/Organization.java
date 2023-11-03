@@ -9,6 +9,11 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.hateoas.RepresentationModel;
 
+// This is fundamentally INCORRECT to set Entity as a REST HATEOAS RepresentationModel,
+// according to the clean architecture requirements.
+// DTO pattern should be used instead.
+// In this case, this is done intentionally for simplicity.
+
 @Getter
 @Setter
 @ToString
