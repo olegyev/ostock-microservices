@@ -1,12 +1,15 @@
 package com.optimagrowth.license.events.sink;
 
+import com.optimagrowth.license.events.handler.OrganizationChangeEventHandler;
 import com.optimagrowth.license.events.model.OrganizationChangeModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 import java.util.function.Consumer;
-
 
 /**
  * Sink == Consumer -> reads messages from Kafka topic
@@ -20,6 +23,11 @@ import java.util.function.Consumer;
 @Configuration
 public class OrganizationChangeSink {
 
+    private static final Logger logger = LoggerFactory.getLogger(OrganizationChangeSink.class);
+
+    @Autowired
+    OrganizationChangeEventHandler organizationChangeEventHandler;
+
     /**
      * @see config/licensing-service.yml#spring.cloud.stream.bindings
      * See <a href="https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream.html#_functional_binding_names">docs</a>
@@ -30,8 +38,8 @@ public class OrganizationChangeSink {
     @Bean
     public Consumer<List<OrganizationChangeModel>> sinkBinding() {
         return events -> {
-            System.out.println("Sinking Kafka records:");
-            events.forEach(System.out::println);
+            logger.debug("Sinking Kafka records:");
+            events.forEach(event -> organizationChangeEventHandler.processOrganizationChangedEvent(event));
         };
     }
 }

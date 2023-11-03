@@ -40,4 +40,12 @@ public class OrganizationRedisClient {
             logger.error("Unable to cache Organization {} in Redis. Exception {}", organization, ex.getMessage());
         }
     }
+
+    public void deleteFromCache(String organizationId) {
+        try {
+            organizationRedisRepository.deleteById(organizationId);
+        } catch (Exception ex) {
+            logger.error("Unable to delete Organization {} from Redis cache. Exception {}", organizationId, ex.getMessage());
+        }
+    }
 }
