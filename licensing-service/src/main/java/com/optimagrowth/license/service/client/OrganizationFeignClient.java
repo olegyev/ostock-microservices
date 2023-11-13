@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * For configuration details,
  * see https://www.javacodemonk.com/feign-requestinterceptor-in-spring-boot-cbe5d967
- * */
+ */
 
-@FeignClient(value = "organization-service", configuration = {FeignClientConfig.class})
+@FeignClient(value = "gateway-server", configuration = {FeignClientConfig.class})
 public interface OrganizationFeignClient {
 
-    @GetMapping(value = "/v1/organization/{organizationId}", consumes = "application/json")
+    @GetMapping(value = "/organization/v1/organization/{organizationId}", consumes = "application/json")
     Organization getOrganization(@PathVariable("organizationId") String organizationId);
 }
