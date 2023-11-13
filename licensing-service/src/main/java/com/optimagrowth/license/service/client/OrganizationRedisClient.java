@@ -41,7 +41,7 @@ public class OrganizationRedisClient {
         }
     }
 
-    public void deleteFromCache(String organizationId) {
+    public void invalidateCache(String organizationId) {
         try {
             organizationRedisRepository.deleteById(organizationId);
         } catch (Exception ex) {

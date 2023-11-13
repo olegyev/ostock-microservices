@@ -48,7 +48,7 @@ public class OrganizationChangeEventHandler {
                 logger.debug("Organization cached in Redis by Kafka event {}: {}", action.getValue(), organizationRetrieved);
                 break;
             case DELETED:
-                organizationRedisClient.deleteFromCache(organizationId);
+                organizationRedisClient.invalidateCache(organizationId);
                 logger.debug("Organization removed from Redis cache by Kafka event {}: {}", action.getValue(), organizationId);
                 break;
             default:
