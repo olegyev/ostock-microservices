@@ -66,6 +66,7 @@ Follow the steps below:
 
 You can regenerate client_secret from within the Keycloak UI admin panel: </br>
 http://localhost:8080/ -> Clients -> Ostock -> Credentials -> Client secret -> Regenerate </br>
+Keycloak Admin Credentials can be found in <a href="https://github.com/olegyev/ostock-microservices/blob/master/docker/docker-compose.yml#L77">Docker Compose file</a>.</br>
 After that, replace above curl call's 'client_secret' attribute with the new value.
 
 <b>NB!</b> </br>
